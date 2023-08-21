@@ -77,6 +77,9 @@ command_ship = Offensive("CommandShip", cannons=24)
 fleet.append(command_ship)
 print(fleet)
 
+
+allowed_tasks = ["refueling", "assistance", "cargo"] # Need to fix this
+
 for _ in range(25):
     random_task = random.choice(allowed_tasks)
     support_vessel = Support("support", random_task)
@@ -133,3 +136,5 @@ support_ships = [ship for ship in fleet if isinstance(ship, Support)]
 
 for offensive, support in zip(offensive_ships, support_ships):
     pairs.append((offensive, support))
+
+# Iterate through the pairs and have their positions to be in adjacent cells
