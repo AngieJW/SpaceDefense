@@ -32,16 +32,15 @@ class Support(Vessel):
     def __init__(self, vessel_type, task):
         super().__init__(vessel_type)
         self.medical_unit = True
-        self.task = task # refueling, mechanical assistance, cargo
+        self.task = task  # refueling, mechanical assistance, cargo
 
     def __str__(self):
         return self.task
 
-
 class Offensive(Vessel):
     def __init__(self, vessel_type, cannons):
         super().__init__(vessel_type)
-        self.cannons = cannons # battleships have 24, destroyers have 12, cruisers have 6
+        self.cannons = cannons  # battleships have 24, destroyers have 12, cruisers have 6
         self.shield = False
 
     # command to attack
@@ -51,9 +50,9 @@ class Offensive(Vessel):
 
     # command to raise shield
     def raise_shield(self):
-        self.shields = True
-
+        self.shield = True
 
 fleet = []
-command_ship = Offensive("CommandShip", (0, 0), cannon_count=24)
+command_ship = Offensive("CommandShip", cannons=24)
 fleet.append(command_ship)
+print(fleet)
