@@ -89,6 +89,11 @@ for _ in range(24):
     offensive_vessel = Offensive("offensive", cannons=24)
     fleet.append(offensive_vessel)
 
+    # for _ in range(24):
+    # random_offensive = random.choice(Offensive.allowed_vessel_types)
+    # offensive_vessel = Offensive(random_offensive)
+    # fleet.append(offensive_vessel)
+
 
 # You are taking your fleet, made up of an equal number of offensive and support ships, to
 # your assigned deployment point when you are ambushed by enemy forces. Your defense
