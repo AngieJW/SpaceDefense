@@ -17,6 +17,36 @@ import random
 # of vessels can be added to your fleet with minimal effort.
 
 
+# define fleet class
+class Fleet:
+    def __init__(self, size):
+        self.size = size
+
+    # contains 50 ships, half support half offensive
+
+    # set 1 commandship per fleet, battleship type
+    # def commandship(self):
+
+# define vessel class
+class Vessel:
+    def __init__(self, vessel_type):
+        self.vessel_type = vessel_type
+        self.coordinates = (0,0)
+
+    # move command
+    def move(self, x, y):
+        self.coordinates = (x,y)
+
+# class for support
+# one medical unit each
+# type: refueling, mechanical assistance, cargo
+# task command: refueling, mechanical assistance, cargo
+
+# class for offensive
+# type: battleships(24can), cruisers(12can) and destroyers(6can)
+# attack command to fire all its cannons
+# raise shield command
+
 
 
 
@@ -31,3 +61,18 @@ import random
 # ships. Your vessels need to assume this defensive formation as quickly as possible, so you
 # will need to find an algorithm that gives an optimized set of pairs, but that is also quick to
 # generate them
+
+# class for grid
+# size
+# place each ship in random positions where empty?
+
+# display grid with ships O for offensive - S for support - _ for empty
+
+# generate pairs of ships, where ships are closest to each other
+# loop :
+#   1 get location of available offensive ship
+#   2 find closest support ship available
+#   3 move support ship next to offensive one
+#   4 set ships as unavailable
+
+# display grid
