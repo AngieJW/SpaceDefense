@@ -19,35 +19,79 @@ import random
 
 # define fleet class
 class Fleet:
+    OFFENSIVE_CRAFT = ['battleship', 'cruiser', 'destroyer']
+    SUPPORT_CRAFT = ['refueling', 'mechanical assistance', 'cargo']
+
     def __init__(self, size):
         self.size = size
+        self.ships = []
+        self.create_fleet()
 
-    # contains 50 ships, half support half offensive
+    # create fleet of size ships
+    def create_fleet(self):
+        # contains size ships, half support half offensive crafts (random vessel_types for each craft)
+        for i in range(self.size):
+            if i < self.size/2:
+                self.ships.append(Vessel(random.choice(self.OFFENSIVE_CRAFT)))
+            else:
+                self.ships.append(Vessel(random.choice(self.SUPPORT_CRAFT)))
+        # set 1 commandship per fleet, a battleship from the list
+        for ship in self.ships:
+            if ship.vessel_type == 'battleship':
+                ship.commandship = True
+                break
 
-    # set 1 commandship per fleet, battleship type
-    # def commandship(self):
+
 
 # define vessel class
 class Vessel:
     def __init__(self, vessel_type):
         self.vessel_type = vessel_type
-        self.coordinates = (0,0)
+        self.coordinates = (0, 0)
+        self.commandship = False
+        self.available = True # to pair support and offensive ships
+
+        if self.vessel_type in Fleet.SUPPORT_CRAFT:
+            # has medical unit
+            self.medical_unit = True
+            # task command = vessel_type
+            self.task = self.vessel_type
+        else:
+            # has cannons : battleships 24, cruisers 12, destroyers 6
+            if self.vessel_type == 'battleships':
+                self.cannons = 24
+            elif self.vessel_type == 'cruisers':
+                self.cannons = 12
+            elif self.vessel_type == 'destroyers':
+                self.cannons = 6
+            else:
+                self.cannons = 0
+            self.shield = False  # Initialize shield
 
     # move command
     def move(self, x, y):
         self.coordinates = (x,y)
 
-# class for support
-# one medical unit each
-# type: refueling, mechanical assistance, cargo
-# task command: refueling, mechanical assistance, cargo
+    #     attack command to fire all its cannons
+    def attack(self):
+        self.cannons = 0
+        print('Firing cannons!')
 
-# class for offensive
-# type: battleships(24can), cruisers(12can) and destroyers(6can)
-# attack command to fire all its cannons
-# raise shield command
+    # raise shield command
+    def raise_shield(self):
+        self.shield = True
+        print('Shield raised!')
 
 
+fleet = Fleet(50)
+
+for i, ship in enumerate(fleet.ships, 1):
+    # find the commandship
+    if ship.commandship:
+        print(f"Ship {i}: {ship.vessel_type} (Command Ship)")
+    # print the rest of the ships
+    else:
+        print(f"Ship {i}: {ship.vessel_type}")
 
 
 # You are taking your fleet, made up of an equal number of offensive and support ships, to
