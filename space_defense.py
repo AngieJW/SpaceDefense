@@ -19,6 +19,14 @@ import random
 
 # define fleet class
 class Fleet:
+    """
+    Represents a fleet consisting of support and offensive crafts.
+
+    Attributes:
+        size (int): number of ships in the fleet.
+        ships (list): list of Vessel objects representing the fleet's ships.
+    """
+
     OFFENSIVE_CRAFT = ['battleship', 'cruiser', 'destroyer']
     SUPPORT_CRAFT = ['refueling', 'mechanical assistance', 'cargo']
 
@@ -45,6 +53,19 @@ class Fleet:
 
 # define vessel class
 class Vessel:
+    """
+    Represents a vessel in the fleet.
+
+    Attributes:
+        vessel_type (str): type of the vessel ('battleship', 'refueling', ...).
+        coordinates (tuple): current coordinates of the vessel.
+        commandship (bool): True if the vessel is the command ship of the fleet.
+        medical_unit (bool): True if the vessel has one medical unit. True when support craft.
+        cannons (int): number of cannons on offensive craft (0 for support craft).
+        shield (bool): True if the vessel's shields are raised, False by default.
+        available (bool): True if the vessel is available for pairing, False if the vessel is adjacent to its paired ship.
+    """
+
     def __init__(self, vessel_type):
         self.vessel_type = vessel_type
         self.coordinates = (0, 0)
@@ -58,11 +79,11 @@ class Vessel:
             self.task = self.vessel_type
         else:
             # has cannons : battleships 24, cruisers 12, destroyers 6
-            if self.vessel_type == 'battleships':
+            if self.vessel_type == 'battleship':
                 self.cannons = 24
-            elif self.vessel_type == 'cruisers':
+            elif self.vessel_type == 'cruiser':
                 self.cannons = 12
-            elif self.vessel_type == 'destroyers':
+            elif self.vessel_type == 'destroyer':
                 self.cannons = 6
             else:
                 self.cannons = 0
