@@ -1,34 +1,17 @@
 import random
-
-# You are the admiral of a mighty space fleet of 50 vessels. Your fleet consists of two major
-# types of vessels - support craft and offensive craft. Vessels can all receive a command
-# that tells them to move to given coordinates.
-# There are three different types of support craft - refueling, mechanical assistance and
-# cargo. They all carry a medical unit. Each vessel can receive orders related to each of the
-# tasks it can carry out.
-# There are also three different types of offensive craft - battleships, cruisers and destroyers.
-# Battleships have 24 cannons, destroyers have 12 and cruisers have 6. Each offensive craft
-# can receive an attack command, which will fire all its cannons. They can also be instructed
-# to raise their shields.
-# Finally, the fleet has a command ship, which is where you are. The command ship is one of
-# the battleships, and there is only one per fleet.
-
-# Define a set of data structures to accurately reflect this fleet. Make sure that new types
-# of vessels can be added to your fleet with minimal effort.
-
+import math
 
 # define fleet class
 class Fleet:
     """
-    Represents a fleet consisting of support and offensive crafts.
+    Represents a fleet consisting of vessels, half support and half offensive crafts.
 
     Attributes:
         size (int): number of ships in the fleet.
         ships (list): list of Vessel objects representing the fleet's ships.
     """
 
-    OFFENSIVE_CRAFT = ['battleship', 'cruiser', 'destroyer']
-    SUPPORT_CRAFT = ['refueling', 'mechanical assistance', 'cargo']
+
 
     def __init__(self, size):
         self.size = size
@@ -40,9 +23,9 @@ class Fleet:
         # contains size ships, half support half offensive crafts (random vessel_types for each craft)
         for i in range(self.size):
             if i < self.size/2:
-                self.ships.append(Vessel(random.choice(self.OFFENSIVE_CRAFT)))
+                self.ships.append(Vessel(random.choice(Vessel.OFFENSIVE_CRAFT)))
             else:
-                self.ships.append(Vessel(random.choice(self.SUPPORT_CRAFT)))
+                self.ships.append(Vessel(random.choice(Vessel.SUPPORT_CRAFT)))
         # set 1 commandship per fleet, a battleship from the list
         for ship in self.ships:
             if ship.vessel_type == 'battleship':
@@ -50,21 +33,22 @@ class Fleet:
                 break
 
 
-
 # define vessel class
 class Vessel:
     """
-    Represents a vessel in the fleet.
+    Represents a vessel.
 
     Attributes:
         vessel_type (str): type of the vessel ('battleship', 'refueling', ...).
         coordinates (tuple): current coordinates of the vessel.
         commandship (bool): True if the vessel is the command ship of the fleet.
+        available (bool): True if the vessel is available for pairing, False if the vessel is adjacent to its paired ship.
         medical_unit (bool): True if the vessel has one medical unit. True when support craft.
         cannons (int): number of cannons on offensive craft (0 for support craft).
         shield (bool): True if the vessel's shields are raised, False by default.
-        available (bool): True if the vessel is available for pairing, False if the vessel is adjacent to its paired ship.
     """
+    OFFENSIVE_CRAFT = ['battleship', 'cruiser', 'destroyer']
+    SUPPORT_CRAFT = ['refueling', 'mechanical assistance', 'cargo']
 
     def __init__(self, vessel_type):
         self.vessel_type = vessel_type
@@ -72,7 +56,7 @@ class Vessel:
         self.commandship = False
         self.available = True # to pair support and offensive ships
 
-        if self.vessel_type in Fleet.SUPPORT_CRAFT:
+        if self.vessel_type in self.SUPPORT_CRAFT:
             # has medical unit
             self.medical_unit = True
             # task command = vessel_type
@@ -93,51 +77,126 @@ class Vessel:
     def move(self, x, y):
         self.coordinates = (x,y)
 
-    #     attack command to fire all its cannons
+    #     attack command only for offensive craft, to fire all its cannons
     def attack(self):
-        self.cannons = 0
-        print('Firing cannons!')
+        if self.vessel_type in self.OFFENSIVE_CRAFT:
+            if self.cannons > 0:
+                print(f"{self.vessel_type} fired {self.cannons} cannons")
+                self.cannons = 0
+            else:
+                print(f"{self.vessel_type} has no cannons left")
+        else:
+            print(f"{self.vessel_type} is not an offensive craft")
+
 
     # raise shield command
     def raise_shield(self):
-        self.shield = True
-        print('Shield raised!')
+        if self.vessel_type in self.OFFENSIVE_CRAFT:
+            self.shield = True
+            print('Shield raised!')
 
 
 fleet = Fleet(50)
 
-for i, ship in enumerate(fleet.ships, 1):
-    # find the commandship
-    if ship.commandship:
-        print(f"Ship {i}: {ship.vessel_type} (Command Ship)")
-    # print the rest of the ships
-    else:
-        print(f"Ship {i}: {ship.vessel_type}")
+# for i, ship in enumerate(fleet.ships, 1):
+#     # find the commandship
+#     if ship.commandship:
+#         print(f"Ship {i}: {ship.vessel_type} (Command Ship)")
+#     # print the rest of the ships
+#     else:
+#         print(f"Ship {i}: {ship.vessel_type}")
 
 
-# You are taking your fleet, made up of an equal number of offensive and support ships, to
-# your assigned deployment point when you are ambushed by enemy forces. Your defense
-# tactic is to pair each support ship with one offensive ship in order to share the offensive
-# ship's shield.
-# Assuming a two-dimensional layout with a maximum size of 100x100, write some code that
-# is able to represent your fleet location data and populate it with your 50 ships in random
-# positions. Then, implement an algorithm that generates 25 pairs of ships, and issues the
-# commands to make the pairs occupy adjacent positions on the grid by moving one or both
-# ships. Your vessels need to assume this defensive formation as quickly as possible, so you
-# will need to find an algorithm that gives an optimized set of pairs, but that is also quick to
-# generate them
+# define class for grid
+class Grid:
+    """
+    Represents a two-dimensional grid with specified length and height.
 
-# class for grid
-# size
-# place each ship in random positions where empty?
+    Attributes:
+        length (int): length (number of rows) of the grid.
+        height (int): height (number of columns) of the grid.
+        grid (list): two-dimensional list representing the grid, initialized with '_'.
+    """
 
-# display grid with ships O for offensive - S for support - _ for empty
+    def __init__(self, length, height):
+        if length > 100 or height > 100:
+            raise ValueError("Grid maximum size is 100x100")
 
-# generate pairs of ships, where ships are closest to each other
-# loop :
-#   1 get location of available offensive ship
-#   2 find closest support ship available
-#   3 move support ship next to offensive one
-#   4 set ships as unavailable
+        self.length = length
+        self.height = height
+        self.ship_letter = {
+            'battleship': 'B',
+            'cruiser': 'C',
+            'destroyer': 'D',
+            'refueling': 'R',
+            'mechanical assistance': 'M',
+            'cargo': 'O'
+        }
+        self.create_grid()
 
-# display grid
+
+    # format grid with two-dimensional layout
+    def create_grid(self):
+        self.grid = []
+        for i in range(self.length):
+            self.grid.append([])
+            for j in range(self.height):
+                self.grid[i].append('_')
+
+    # if spot is empty
+    def is_empty(self, x, y):
+        if self.grid[x][y] == '_':
+            return True
+        else:
+            return False
+
+    def place_ship(self, x, y, vessel_type):
+        if self.is_empty(x, y):
+            # assign ship letter to grid spot
+            self.grid[x][y] = self.ship_letter.get(vessel_type, '_')
+
+    def __str__(self):
+        grid_str = ""
+        for row in self.grid:
+            grid_str += " ".join(row) + "\n"
+        return grid_str
+
+# example grid
+grid = Grid(100, 100)
+
+
+# place each ship from fleet in random positions where is_empty
+for ship in fleet.ships:
+    while True:
+        x = random.randint(0, grid.length - 1)
+        y = random.randint(0, grid.height - 1)
+        if grid.is_empty(x, y):
+            grid.place_ship(x, y, ship.vessel_type)
+            ship.move(x, y)
+            break
+
+print(grid)
+
+# generate pairs of ships :
+        #   get location of available offensive ship
+        #   get its adjacent is_empty spot in the grid, check row first then column
+        #   find closest support ship available
+        #   move support ship to adjacent spot
+        #   set both ships as unavailable
+        #   repeat until all ships are paired
+
+# get location of available offensive ship
+for ship in fleet.ships:
+    if ship.available and ship.vessel_type in Fleet.OFFENSIVE_CRAFT:
+        x, y = ship.coordinates
+        # find adjacent is_empty spot in the grid, check row first then column
+        if x < grid.length - 1 and grid.is_empty(x + 1, y):
+            available_spot = (x + 1, y)
+        elif x > 0 and grid.is_empty(x - 1, y):
+            available_spot = (x - 1, y)
+        elif y < grid.height - 1 and grid.is_empty(x, y + 1):
+            available_spot = (x, y + 1)
+        elif y > 0 and grid.is_empty(x, y - 1):
+            available_spot = (x, y - 1)
+        else:
+            print(f"No available spot for support ship for offensive ship{ship.vessel_type} at {x}, {y}")
